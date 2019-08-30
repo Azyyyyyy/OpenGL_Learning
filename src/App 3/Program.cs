@@ -14,12 +14,13 @@ namespace App_3
         private static float[] Vertices = 
         {
             0.5f,  0.5f, 0.0f,  // top right
-             0.5f, -0.5f, 0.0f,  // bottom right
+            0.5f, -0.5f, 0.0f,  // bottom right
             -0.5f, -0.5f, 0.0f,  // bottom left
             -0.5f,  0.5f, 0.0f   // top left
         };
         private static uint[] Indices =
-        {  // note that we start from 0!
+        {  
+            // note that we start from 0!
             0, 1, 3,   // first triangle
             1, 2, 3    // second triangle
         };
@@ -30,6 +31,7 @@ namespace App_3
         static void Main()
         {
             var window = Window.Create(WindowOptions.Default);
+            window.Size = new Size(500, 250);
             window.Load += Window_Load;
             window.Resize += Window_Resize;
             window.Render += Window_Render;
@@ -55,55 +57,58 @@ namespace App_3
 
         private unsafe static void Window_Load()
         {
-            string VertexShaderSource;
-
+            string vertexShaderSource;
             using (StreamReader reader = new StreamReader("shader.vert", Encoding.UTF8))
             {
-                VertexShaderSource = reader.ReadToEnd();
+                vertexShaderSource = reader.ReadToEnd();
             }
 
-            string FragmentShaderSource;
-
+            string fragmentShaderSource;
             using (StreamReader reader = new StreamReader("shader.frag", Encoding.UTF8))
             {
-                FragmentShaderSource = reader.ReadToEnd();
+                fragmentShaderSource = reader.ReadToEnd();
             }
 
-            var VertexShader = GL.CreateShader(GLEnum.VertexShader);
-            GL.ShaderSource(VertexShader, VertexShaderSource);
+            // Get Vertex Shader
+            var vertexShader = GL.CreateShader(GLEnum.VertexShader);
+            GL.ShaderSource(vertexShader, vertexShaderSource);
 
-            var FragmentShader = GL.CreateShader(GLEnum.FragmentShader);
-            GL.ShaderSource(FragmentShader, FragmentShaderSource);
-
-            GL.CompileShader(VertexShader);
-            var vertexCompileError = GL.GetShaderInfoLog(VertexShader);
-            if (!string.IsNullOrWhiteSpace(vertexCompileError))
+            GL.CompileShader(vertexShader);
+            string infoLogVert = GL.GetShaderInfoLog(vertexShader);
+            if (!string.IsNullOrWhiteSpace(infoLogVert))
             {
-                Console.WriteLine($"Ah shit here we go again:\r\n{vertexCompileError}");
+                Console.WriteLine(infoLogVert);
             }
 
-            GL.CompileShader(FragmentShader);
-            var fragmentCompileError = GL.GetShaderInfoLog(FragmentShader);
-            if (!string.IsNullOrWhiteSpace(fragmentCompileError))
+            // Get Fragment Shader
+            var fragmentShader = GL.CreateShader(GLEnum.FragmentShader);
+            GL.ShaderSource(fragmentShader, fragmentShaderSource);
+
+            GL.CompileShader(fragmentShader);
+            string infoLogFrag = GL.GetShaderInfoLog(fragmentShader);
+            if (!string.IsNullOrWhiteSpace(infoLogFrag))
             {
-                Console.WriteLine($"Ah shit here we go again:\r\n{fragmentCompileError}");
+                Console.WriteLine(infoLogFrag);
             }
 
+            // Make program, attach, link and cleanup
             Handle = GL.CreateProgram();
 
-            GL.AttachShader(Handle, VertexShader);
-            GL.AttachShader(Handle, FragmentShader);
+            GL.AttachShader(Handle, vertexShader);
+            GL.AttachShader(Handle, fragmentShader);
 
             GL.LinkProgram(Handle);
 
-            GL.DetachShader(Handle, VertexShader);
-            GL.DetachShader(Handle, FragmentShader);
-            GL.DeleteShader(FragmentShader);
-            GL.DeleteShader(VertexShader);
+            GL.DetachShader(Handle, vertexShader);
+            GL.DetachShader(Handle, fragmentShader);
+            GL.DeleteShader(fragmentShader);
+            GL.DeleteShader(vertexShader);
 
-            GL.ClearColor(Color.BurlyWood);
-            var _vertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(GLEnum.ArrayBuffer, _vertexBufferObject);
+            // Change backgroud colour
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+            var vertexBufferObject = GL.GenBuffer();
+            GL.BindBuffer(GLEnum.ArrayBuffer, vertexBufferObject);
             fixed (void* vertices = Vertices)
             {
                 GL.BufferData(GLEnum.ArrayBuffer, (uint)Vertices.Length * sizeof(float), vertices, GLEnum.StaticDraw);
@@ -121,9 +126,7 @@ namespace App_3
 
             GL.VertexAttribPointer(0, 3, GLEnum.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
-            GL.BindBuffer(GLEnum.ArrayBuffer, _vertexBufferObject);
-
-            //GL.LinkProgram(Handle)
+            GL.BindBuffer(GLEnum.ArrayBuffer, vertexBufferObject);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace App_2
     class Program
     {
         private static GL GL = GL.GetApi();
-        private static float[] Vertices = 
+        private static readonly float[] Vertices = 
         {
             //X      Y      Z
             -0.5f, -0.5f, 0.0f, //Bottom-left vertex
@@ -35,9 +35,8 @@ namespace App_2
 
         private static void Window_Closing()
         {
-            GL ??= GL.GetApi();
-
             GL.BindBuffer(GLEnum.ArrayBuffer, 0);
+            //Note we are crashing here and I don't know why
             GL.DeleteBuffer(VertexBufferObject);
             GL.DeleteProgram(Handle);
         }
@@ -50,53 +49,57 @@ namespace App_2
 
         private unsafe static void Window_Load()
         {
-            string VertexShaderSource;
-
+            string vertexShaderSource;
             using (StreamReader reader = new StreamReader("shader.vert", Encoding.UTF8))
             {
-                VertexShaderSource = reader.ReadToEnd();
+                vertexShaderSource = reader.ReadToEnd();
             }
 
-            string FragmentShaderSource;
-
+            string fragmentShaderSource;
             using (StreamReader reader = new StreamReader("shader.frag", Encoding.UTF8))
             {
-                FragmentShaderSource = reader.ReadToEnd();
+                fragmentShaderSource = reader.ReadToEnd();
             }
 
-            var VertexShader = GL.CreateShader(GLEnum.VertexShader);
-            GL.ShaderSource(VertexShader, VertexShaderSource);
+            // Get Vertex Shader
+            var vertexShader = GL.CreateShader(GLEnum.VertexShader);
+            GL.ShaderSource(vertexShader, vertexShaderSource);
 
-            var FragmentShader = GL.CreateShader(GLEnum.FragmentShader);
-            GL.ShaderSource(FragmentShader, FragmentShaderSource);
-
-            GL.CompileShader(VertexShader);
-            string infoLogVert = GL.GetShaderInfoLog(VertexShader);
+            GL.CompileShader(vertexShader);
+            string infoLogVert = GL.GetShaderInfoLog(vertexShader);
             if (!string.IsNullOrWhiteSpace(infoLogVert))
             {
                 Console.WriteLine(infoLogVert);
             }
 
-            GL.CompileShader(FragmentShader);
-            string infoLogFrag = GL.GetShaderInfoLog(FragmentShader);
+            // Get Fragment Shader
+            var fragmentShader = GL.CreateShader(GLEnum.FragmentShader);
+            GL.ShaderSource(fragmentShader, fragmentShaderSource);
+
+            GL.CompileShader(fragmentShader);
+            string infoLogFrag = GL.GetShaderInfoLog(fragmentShader);
             if (!string.IsNullOrWhiteSpace(infoLogFrag))
             {
                 Console.WriteLine(infoLogFrag);
             }
 
+            // Make program, attach, link and cleanup
             Handle = GL.CreateProgram();
 
-            GL.AttachShader(Handle, VertexShader);
-            GL.AttachShader(Handle, FragmentShader);
+            GL.AttachShader(Handle, vertexShader);
+            GL.AttachShader(Handle, fragmentShader);
 
             GL.LinkProgram(Handle);
 
-            GL.DetachShader(Handle, VertexShader);
-            GL.DetachShader(Handle, FragmentShader);
-            GL.DeleteShader(FragmentShader);
-            GL.DeleteShader(VertexShader);
+            GL.DetachShader(Handle, vertexShader);
+            GL.DetachShader(Handle, fragmentShader);
+            GL.DeleteShader(fragmentShader);
+            GL.DeleteShader(vertexShader);
 
+            // Change backgroud colour
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+            // Get vertex buffer
             VertexBufferObject = GL.GenBuffer();
             GL.BindBuffer(GLEnum.ArrayBuffer, VertexBufferObject);
             fixed (void* vertices = Vertices)
@@ -110,7 +113,6 @@ namespace App_2
             GL.VertexAttribPointer(0, 3, GLEnum.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
             GL.BindBuffer(GLEnum.ArrayBuffer, VertexBufferObject);
-            Console.WriteLine("done load");
         }
 
         private static void Window_Update(double obj)

@@ -12,4 +12,7 @@ Shows a Triangle 🔺
 ### [App 3](https://github.com/AzyIsCool/OpenGL_Learning/tree/master/src/App%203)
 Shows a rectangle
 
+### [App 4](https://github.com/AzyIsCool/OpenGL_Learning/tree/master/src/App%204)
+Shows a rectangle with a texture **(Broken right now)**
+
 # This code will change a lot and some app's will be messy/broken

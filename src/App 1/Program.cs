@@ -11,11 +11,11 @@ namespace App_1
 {
     static class Program
     {
-        private static List<CustomWindow> Windows = new List<CustomWindow>();
+        private static readonly List<CustomWindow> Windows = new List<CustomWindow>();
         private static readonly GL GL = GL.GetApi();
         private static readonly Random Random = new Random();
 
-        private static CancellationTokenSource TokenSource = new CancellationTokenSource();
+        private static readonly CancellationTokenSource TokenSource = new CancellationTokenSource();
         private static CancellationToken Token => TokenSource.Token;
 
         private static async Task Main()
@@ -65,12 +65,12 @@ namespace App_1
                 return null;
             }
 
-            //new WindowOptions(true, false, new Point(0, 0), new Size(250, 500), 67, 67, GraphicsAPI.Default, "Wew", WindowState.Normal, WindowBorder.Resizable, VSyncMode.Adaptive, 30)
-            var window = new CustomWindow(WindowOptions.Default);
-            window.Size = new Size(500, 250);
-            window.WindowBorder = WindowBorder.Resizable;
-            window.Title = $"Wew {Windows.Count + 1}";
-
+            var window = new CustomWindow(WindowOptions.Default)
+            {
+                Size = new Size(500, 250),
+                WindowBorder = WindowBorder.Resizable,
+                Title = $"Wew {Windows.Count + 1}"
+            };
 
             window.Load += async () => 
             {
