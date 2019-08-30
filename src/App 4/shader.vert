@@ -6,7 +6,7 @@ layout(location = 1) in vec2 aTexCoord;
 
 out vec2 texCoord;
 
-void main(void)
+void main()
 {
     texCoord = aTexCoord;
 

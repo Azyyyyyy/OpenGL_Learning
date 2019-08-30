@@ -25,7 +25,7 @@ namespace App_4
             1, 2, 3    // second triangle
         };
         private static uint VertexArrayObject;
-        private static uint Handle;
+        public static uint Handle;
         private static uint ElementBufferObject;
 
         static void Main()
@@ -69,7 +69,7 @@ namespace App_4
                 fragmentShaderSource = reader.ReadToEnd();
             }
 
-            // Get Vertex Shader
+            // Make Vertex Shader
             var vertexShader = GL.GLApi.CreateShader(GLEnum.VertexShader);
             GL.GLApi.ShaderSource(vertexShader, vertexShaderSource);
 
@@ -80,7 +80,7 @@ namespace App_4
                 Console.WriteLine(infoLogVert);
             }
 
-            // Get Fragment Shader
+            // Make Fragment Shader
             var fragmentShader = GL.GLApi.CreateShader(GLEnum.FragmentShader);
             GL.GLApi.ShaderSource(fragmentShader, fragmentShaderSource);
 
