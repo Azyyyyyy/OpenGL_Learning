@@ -1,15 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>App_1</AssemblyName>
     <RootNamespace>App_1</RootNamespace>
     <LangVersion>preview</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputType>WinExe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
